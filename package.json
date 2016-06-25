@@ -2,9 +2,9 @@
   "name": "react_js_blog",
   "version": "1.0.0",
   "description": "",
-  "main": "./server/bin/www",
+  "main": "./bin/www",
   "scripts": {
-    "start": "node ./server/bin/www",
+    "start": "node ./bin/www",
     "dev": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot"
   },
   "keywords": [],

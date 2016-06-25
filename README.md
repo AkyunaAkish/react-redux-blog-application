@@ -34,5 +34,6 @@ $ createdb react_blog (if you have postgreSQL on your machine)
 $ npm install -g knex webpack webpack-dev-server nodemon
 $ npm install
 $ webpack
-$ nodemon
+$ cd dist && bower install
+$ cd .. && nodemon
 ```

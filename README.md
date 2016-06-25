@@ -7,11 +7,14 @@
 ReactJS
 Redux
 WebpackJS
+JavaScript
 NPM
 Bower
 Axios
 JSX
+HTML
 SASS
+BootStrap
 ```
 
 ### Back-End

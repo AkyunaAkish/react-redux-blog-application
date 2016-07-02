@@ -83,7 +83,7 @@
 	
 	var _routes2 = _interopRequireDefault(_routes);
 	
-	__webpack_require__(329);
+	__webpack_require__(331);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28440,7 +28440,8 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var rootReducer = (0, _redux.combineReducers)({
-	  blogs: _reducer_blogs2.default
+	  blogs: _reducer_blogs2.default,
+	  form: _reduxForm.reducer
 	});
 	
 	exports.default = rootReducer;
@@ -31496,6 +31497,10 @@
 	      return _extends({}, state, { all: action.payload.data });
 	      break;
 	
+	    case _index.FETCH_BLOG:
+	      return _extends({}, state, { blog: action.payload.data });
+	      break;
+	
 	    default:
 	      return state;
 	  }
@@ -31514,9 +31519,12 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.CREATE_BLOG_POST = exports.FETCH_BLOGS = undefined;
+	exports.DELETE_BLOG = exports.CREATE_BLOG = exports.EDIT_BLOG = exports.FETCH_BLOG = exports.FETCH_BLOGS = undefined;
 	exports.fetchBlogs = fetchBlogs;
+	exports.fetchBlog = fetchBlog;
 	exports.createBlogPost = createBlogPost;
+	exports.editBlogPost = editBlogPost;
+	exports.deleteBlogPost = deleteBlogPost;
 	
 	var _axios = __webpack_require__(306);
 	
@@ -31525,7 +31533,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var FETCH_BLOGS = exports.FETCH_BLOGS = 'FETCH_BLOGS';
-	var CREATE_BLOG_POST = exports.CREATE_BLOG_POST = 'CREATE_BLOG_POST';
+	var FETCH_BLOG = exports.FETCH_BLOG = 'FETCH_BLOG';
+	var EDIT_BLOG = exports.EDIT_BLOG = 'EDIT_BLOG';
+	var CREATE_BLOG = exports.CREATE_BLOG = 'CREATE_BLOG';
+	var DELETE_BLOG = exports.DELETE_BLOG = 'DELETE_BLOG';
 	
 	var ROOT_URL = 'http://localhost:3000/api/v1';
 	
@@ -31538,11 +31549,38 @@
 	  };
 	}
 	
+	function fetchBlog(id) {
+	  var request = _axios2.default.get(ROOT_URL + '/blogs/' + id);
+	
+	  return {
+	    type: FETCH_BLOG,
+	    payload: request
+	  };
+	}
+	
 	function createBlogPost(blogData) {
 	  var request = _axios2.default.post(ROOT_URL + '/blogs', blogData);
 	
 	  return {
-	    type: CREATE_BLOG_POST,
+	    type: CREATE_BLOG,
+	    payload: request
+	  };
+	}
+	
+	function editBlogPost(id, newData) {
+	  var request = _axios2.default.put(ROOT_URL + '/blogs/' + id, newData);
+	
+	  return {
+	    type: EDIT_BLOG,
+	    payload: request
+	  };
+	}
+	
+	function deleteBlogPost(id) {
+	  var request = _axios2.default.delete(ROOT_URL + '/blogs/' + id);
+	
+	  return {
+	    type: DELETE_BLOG,
 	    payload: request
 	  };
 	}
@@ -32787,6 +32825,14 @@
 	
 	var _blogs_new2 = _interopRequireDefault(_blogs_new);
 	
+	var _blogs_show = __webpack_require__(329);
+	
+	var _blogs_show2 = _interopRequireDefault(_blogs_show);
+	
+	var _blogs_edit = __webpack_require__(330);
+	
+	var _blogs_edit2 = _interopRequireDefault(_blogs_edit);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = _react2.default.createElement(
@@ -32794,6 +32840,8 @@
 	  { path: '/', component: _Layout2.default },
 	  _react2.default.createElement(_reactRouter.IndexRoute, { component: _blogs_index2.default }),
 	  _react2.default.createElement(_reactRouter.Route, { path: 'blogs/new', component: _blogs_new2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'blogs/:id', component: _blogs_show2.default }),
+	  _react2.default.createElement(_reactRouter.Route, { path: 'blogs/:id/edit', component: _blogs_edit2.default }),
 	  _react2.default.createElement(_reactRouter.Redirect, { from: '*', to: '/' })
 	);
 
@@ -32879,37 +32927,158 @@
 	var BlogsIndex = function (_Component) {
 	  _inherits(BlogsIndex, _Component);
 	
-	  function BlogsIndex() {
+	  function BlogsIndex(props) {
 	    _classCallCheck(this, BlogsIndex);
 	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(BlogsIndex).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BlogsIndex).call(this, props));
+	
+	    _this.state = {
+	      filteredBlogs: props.blogs
+	    };
+	    return _this;
 	  }
 	
 	  _createClass(BlogsIndex, [{
 	    key: 'componentWillMount',
 	    value: function componentWillMount() {
-	      this.props.fetchBlogs();
+	      var _this2 = this;
+	
+	      this.props.fetchBlogs().then(function () {
+	        _this2.setState({
+	          filteredBlogs: _this2.props.blogs
+	        });
+	      });
 	    }
 	  }, {
 	    key: 'renderBlogs',
-	    value: function renderBlogs() {
-	      return this.props.blogs.map(function (blog) {
-	        return { blog: blog };
+	    value: function renderBlogs(blogArr) {
+	      return blogArr.map(function (blog) {
+	        return _react2.default.createElement(
+	          'div',
+	          { className: 'blogPostOuter', key: blog.id },
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: 'blogs/' + blog.id },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'container blogItemContainer' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'row-fluid' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'col-lg-4' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'item' },
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'content' },
+	                      _react2.default.createElement('img', { className: 'repeatedImage', src: blog.image_url })
+	                    )
+	                  )
+	                ),
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'col-lg-8' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'item' },
+	                    _react2.default.createElement(
+	                      'div',
+	                      { className: 'content' },
+	                      _react2.default.createElement(
+	                        'h1',
+	                        null,
+	                        'Author'
+	                      ),
+	                      _react2.default.createElement(
+	                        'p',
+	                        null,
+	                        blog.author
+	                      ),
+	                      _react2.default.createElement(
+	                        'h1',
+	                        null,
+	                        'Topic'
+	                      ),
+	                      _react2.default.createElement(
+	                        'p',
+	                        null,
+	                        blog.topic
+	                      )
+	                    )
+	                  )
+	                )
+	              )
+	            )
+	          )
+	        );
 	      });
+	    }
+	
+	    // if searchTerm is blank then set filteredBlogs to this.props.blogs
+	
+	  }, {
+	    key: 'filterResults',
+	    value: function filterResults(searchTerm) {
+	      if (searchTerm.length < 1) {
+	        this.setState({
+	          filteredBlogs: this.props.blogs
+	        });
+	      } else {
+	        this.setState({
+	          filteredBlogs: this.props.blogs.filter(function (curr, index, arr) {
+	            var termSplit = searchTerm.toLowerCase().split("");
+	            var currAuthorSplit = curr.author.toLowerCase().split("");
+	            var currTopicSplit = curr.topic.toLowerCase().split("");
+	
+	            for (var i = 0; i < termSplit.length; i++) {
+	              if (currAuthorSplit.indexOf(termSplit[i]) > -1 || currTopicSplit.indexOf(termSplit[i]) > -1) {
+	                return curr;
+	              }
+	            }
+	          })
+	        });
+	      }
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var _this3 = this;
+	
+	      if (!this.state.filteredBlogs) return _react2.default.createElement(
+	        'div',
+	        { className: 'loader' },
+	        'Loading...'
+	      );
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        'Blogs Index',
 	        _react2.default.createElement(
-	          _reactRouter.Link,
-	          { to: '/blogs/new' },
-	          'Add New Blog Post'
+	          'h1',
+	          { className: 'writingsHeader' },
+	          'Writings On The Wall'
 	        ),
-	        this.renderBlogs()
+	        _react2.default.createElement(
+	          'form',
+	          { onSubmit: this.onFormSubmit, className: 'input-group searchBlogForm' },
+	          _react2.default.createElement('input', {
+	            type: 'text',
+	            className: 'form-control searchInput',
+	            placeholder: 'Filter writings',
+	            onInput: function onInput(event) {
+	              return _this3.filterResults(event.target.value);
+	            } }),
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/blogs/new', className: 'btn link addPost' },
+	            'Add New Writing'
+	          )
+	        ),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement('br', null),
+	        this.renderBlogs(this.state.filteredBlogs)
 	      );
 	    }
 	  }]);
@@ -32933,6 +33102,8 @@
 	  value: true
 	});
 	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _react = __webpack_require__(2);
@@ -32942,6 +33113,8 @@
 	var _reduxForm = __webpack_require__(260);
 	
 	var _index = __webpack_require__(305);
+	
+	var _reactRouter = __webpack_require__(192);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -32969,21 +33142,104 @@
 	        _this2.context.router.push('/');
 	      });
 	    }
-	
-	    // <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
-	    //
-	    // </form>
-	
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var _props = this.props;
+	      var _props$fields = _props.fields;
+	      var author = _props$fields.author;
+	      var topic = _props$fields.topic;
+	      var content = _props$fields.content;
+	      var image_url = _props$fields.image_url;
+	      var handleSubmit = _props.handleSubmit;
+	
+	
 	      return _react2.default.createElement(
 	        'div',
 	        null,
 	        _react2.default.createElement(
-	          'h1',
-	          null,
-	          'Hi'
+	          'form',
+	          { onSubmit: handleSubmit(this.onSubmit.bind(this)), className: 'form blogItemContainer blogCreateForm' },
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/', className: 'btn link' },
+	            'Home'
+	          ),
+	          _react2.default.createElement(
+	            'h1',
+	            null,
+	            'Create Writing'
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group ' + (author.touched && author.invalid ? 'has-danger' : '') },
+	            _react2.default.createElement(
+	              'label',
+	              null,
+	              'Author'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'text-danger' },
+	              author.touched ? author.error : null
+	            ),
+	            _react2.default.createElement('input', _extends({ type: 'text', className: 'form-control' }, author))
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group ' + (topic.touched && topic.invalid ? 'has-danger' : '') },
+	            _react2.default.createElement(
+	              'label',
+	              null,
+	              'Topic'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'text-danger' },
+	              topic.touched ? topic.error : null
+	            ),
+	            _react2.default.createElement('input', _extends({ type: 'text', className: 'form-control' }, topic))
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group ' + (content.touched && content.invalid ? 'has-danger' : '') },
+	            _react2.default.createElement(
+	              'label',
+	              null,
+	              'Content'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'text-danger' },
+	              content.touched ? content.error : null
+	            ),
+	            _react2.default.createElement('textarea', _extends({ type: 'text', className: 'form-control' }, content))
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'form-group ' + (image_url.touched && image_url.invalid ? 'has-danger' : '') },
+	            _react2.default.createElement(
+	              'label',
+	              null,
+	              'Image URL'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'text-danger' },
+	              image_url.touched ? image_url.error : null
+	            ),
+	            _react2.default.createElement('input', _extends({ type: 'text', className: 'form-control' }, image_url))
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { type: 'submit', className: 'btn formButtons' },
+	            'Submit'
+	          ),
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/', className: 'btn formButtons' },
+	            'Cancel'
+	          )
 	        )
 	      );
 	    }
@@ -32995,19 +33251,415 @@
 	BlogsNew.contextTypes = {
 	  router: _react.PropTypes.object
 	};
-	exports.default = BlogsNew;
+	
+	
+	function validate(values) {
+	  var errors = {};
+	  if (!values.author) errors.author = 'Please enter author name';
+	  if (!values.topic) errors.topic = 'Please enter the topic of your writing';
+	  if (!values.content) errors.content = 'Please enter the content of your writing';
+	  if (values.content && values.content.length > 1000) errors.content = 'Cannot exceed 1000 characters';
+	  if (!values.image_url) errors.image_url = 'Please enter an image url for your writing';
+	  return errors;
+	}
+	
+	exports.default = (0, _reduxForm.reduxForm)({
+	  form: 'BlogsNewForm',
+	  fields: ['author', 'topic', 'content', 'image_url'],
+	  validate: validate
+	}, null, { createBlogPost: _index.createBlogPost })(BlogsNew);
 
 /***/ },
 /* 329 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRedux = __webpack_require__(182);
+	
+	var _index = __webpack_require__(305);
+	
+	var _reactRouter = __webpack_require__(192);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var BlogsShow = function (_Component) {
+	  _inherits(BlogsShow, _Component);
+	
+	  function BlogsShow() {
+	    _classCallCheck(this, BlogsShow);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(BlogsShow).apply(this, arguments));
+	  }
+	
+	  _createClass(BlogsShow, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      this.props.fetchBlog(this.props.params.id);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var blog = this.props.blog;
+	
+	      if (!blog) return _react2.default.createElement(
+	        'div',
+	        { className: 'loader' },
+	        'Loading...'
+	      );
+	
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/', className: 'btn link' },
+	          'Home'
+	        ),
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/blogs/' + this.props.params.id + '/edit', className: 'btn link' },
+	          'Edit Writing'
+	        ),
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'container blogItemContainer blogShow' },
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'row-fluid' },
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'col-lg-12' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'item' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'content' },
+	                    _react2.default.createElement('img', { src: blog.image_url })
+	                  )
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'col-lg-12' },
+	                _react2.default.createElement(
+	                  'div',
+	                  { className: 'item' },
+	                  _react2.default.createElement(
+	                    'div',
+	                    { className: 'content' },
+	                    _react2.default.createElement(
+	                      'h1',
+	                      null,
+	                      'Author'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      null,
+	                      blog.author
+	                    ),
+	                    _react2.default.createElement(
+	                      'h1',
+	                      null,
+	                      'Title'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      null,
+	                      blog.topic
+	                    ),
+	                    _react2.default.createElement(
+	                      'h1',
+	                      null,
+	                      'Content'
+	                    ),
+	                    _react2.default.createElement(
+	                      'p',
+	                      null,
+	                      blog.content
+	                    )
+	                  )
+	                )
+	              )
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return BlogsShow;
+	}(_react.Component);
+	
+	function mapStateToProps(state) {
+	  return { blog: state.blogs.blog };
+	}
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, { fetchBlog: _index.fetchBlog })(BlogsShow);
+
+/***/ },
+/* 330 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(2);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reduxForm = __webpack_require__(260);
+	
+	var _index = __webpack_require__(305);
+	
+	var _reactRouter = __webpack_require__(192);
+	
+	var _axios = __webpack_require__(306);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var BlogsEdit = function (_Component) {
+	  _inherits(BlogsEdit, _Component);
+	
+	  function BlogsEdit() {
+	    _classCallCheck(this, BlogsEdit);
+	
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(BlogsEdit).apply(this, arguments));
+	  }
+	
+	  _createClass(BlogsEdit, [{
+	    key: 'componentWillMount',
+	    value: function componentWillMount() {
+	      this.props.fetchBlog(this.props.params.id);
+	    }
+	  }, {
+	    key: 'onSubmit',
+	    value: function onSubmit(formData) {
+	      var _this2 = this;
+	
+	      console.log('Edit form data...', formData);
+	      this.props.editBlogPost(this.props.params.id, formData).then(function () {
+	        _this2.context.router.push('/');
+	      });
+	    }
+	  }, {
+	    key: 'onDeleteClick',
+	    value: function onDeleteClick(event) {
+	      var _this3 = this;
+	
+	      if (confirm('Are you sure you want to delete this blog post?')) {
+	        this.props.deleteBlogPost(this.props.params.id).then(function () {
+	          _this3.context.router.push('/');
+	        });
+	      } else {
+	        event.preventDefault();
+	      }
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props;
+	      var _props$fields = _props.fields;
+	      var author = _props$fields.author;
+	      var topic = _props$fields.topic;
+	      var content = _props$fields.content;
+	      var image_url = _props$fields.image_url;
+	      var handleSubmit = _props.handleSubmit;
+	
+	      if (!blog) return _react2.default.createElement(
+	        'div',
+	        null,
+	        'Loading...'
+	      );
+	
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          _react2.default.createElement(
+	            'form',
+	            { onSubmit: handleSubmit(this.onSubmit.bind(this)), className: 'form blogItemContainer editForm' },
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { to: '/', className: 'btn link' },
+	              'Home'
+	            ),
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { to: '/blogs/' + this.props.params.id, className: 'btn link' },
+	              'Back'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              {
+	                onClick: this.onDeleteClick.bind(this),
+	                className: 'btn formButtons' },
+	              'Delete'
+	            ),
+	            _react2.default.createElement(
+	              'h1',
+	              null,
+	              'Edit Writing'
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'form-group ' + (author.touched && author.invalid ? 'has-danger' : '') },
+	              _react2.default.createElement(
+	                'label',
+	                null,
+	                'Author'
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'text-danger' },
+	                author.touched ? author.error : null
+	              ),
+	              _react2.default.createElement('input', _extends({ type: 'text', className: 'form-control' }, author))
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'form-group ' + (topic.touched && topic.invalid ? 'has-danger' : '') },
+	              _react2.default.createElement(
+	                'label',
+	                null,
+	                'Topic'
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'text-danger' },
+	                topic.touched ? topic.error : null
+	              ),
+	              _react2.default.createElement('input', _extends({ type: 'text', className: 'form-control' }, topic))
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'form-group ' + (content.touched && content.invalid ? 'has-danger' : '') },
+	              _react2.default.createElement(
+	                'label',
+	                null,
+	                'Content'
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'text-danger' },
+	                content.touched ? content.error : null
+	              ),
+	              _react2.default.createElement('textarea', _extends({ type: 'text', className: 'form-control' }, content))
+	            ),
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'form-group ' + (image_url.touched && image_url.invalid ? 'has-danger' : '') },
+	              _react2.default.createElement(
+	                'label',
+	                null,
+	                'Image URL'
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'text-danger' },
+	                image_url.touched ? image_url.error : null
+	              ),
+	              _react2.default.createElement('input', _extends({ type: 'text', className: 'form-control' }, image_url))
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { type: 'submit', className: 'btn formButtons' },
+	              'Submit'
+	            ),
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { to: '/', className: 'btn formButtons' },
+	              'Cancel'
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+	
+	  return BlogsEdit;
+	}(_react.Component);
+	
+	BlogsEdit.contextTypes = {
+	  router: _react.PropTypes.object
+	};
+	
+	
+	function validate(values) {
+	  var errors = {};
+	  if (!values.author) errors.author = 'Please enter author name';
+	  if (!values.topic) errors.topic = 'Please enter the topic of your writing';
+	  if (!values.content) errors.content = 'Please enter the content of your writing';
+	  if (values.content && values.content.length > 1000) errors.content = 'Cannot exceed 1000 characters';
+	  if (!values.image_url) errors.image_url = 'Please enter an image url for your writing';
+	  return errors;
+	}
+	
+	exports.default = (0, _reduxForm.reduxForm)({
+	  form: 'BlogsNewForm',
+	  fields: ['author', 'topic', 'content', 'image_url'],
+	  validate: validate
+	}, function (state) {
+	  if (state.blogs.blog) {
+	    return {
+	      initialValues: {
+	        author: state.blogs.blog.author,
+	        topic: state.blogs.blog.topic,
+	        content: state.blogs.blog.content,
+	        image_url: state.blogs.blog.image_url
+	      }
+	    };
+	  }
+	}, { fetchBlog: _index.fetchBlog, editBlogPost: _index.editBlogPost, deleteBlogPost: _index.deleteBlogPost })(BlogsEdit);
+
+/***/ },
+/* 331 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(330);
+	var content = __webpack_require__(332);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(332)(content, {});
+	var update = __webpack_require__(334)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -33024,21 +33676,21 @@
 	}
 
 /***/ },
-/* 330 */
+/* 332 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(331)();
+	exports = module.exports = __webpack_require__(333)();
 	// imports
 	
 	
 	// module
-	exports.push([module.id, "body {\n  background: black;\n  color: white; }\n", ""]);
+	exports.push([module.id, "*, *:before, *:after {\n  box-sizing: border-box; }\n\nimg, embed, object, video {\n  max-width: 100%;\n  height: auto; }\n\nbody {\n  padding-top: 10px;\n  background: url(\"/images/stoneWall.jpg\") no-repeat center center fixed;\n  -webkit-background-size: cover;\n  -moz-background-size: cover;\n  -o-background-size: cover;\n  background-size: cover;\n  font-family: 'Raleway', sans-serif;\n  color: #74dc23; }\n\n.text-danger {\n  text-shadow: 0 0 20px red; }\n\n.has-danger input, .has-danger textarea {\n  border: 1px solid maroon; }\n\nform a {\n  margin-left: 5px; }\n\nform textarea {\n  resize: none; }\n\n.link {\n  background: #373f3a;\n  color: #74dc23;\n  margin-left: 10px; }\n\n.blogItemContainer {\n  background: rgba(55, 63, 58, 0.7);\n  color: #74dc23;\n  padding: 20px;\n  border-radius: 10px;\n  margin-bottom: 10px;\n  word-wrap: break-word; }\n  .blogItemContainer a {\n    text-decoration: none; }\n  .blogItemContainer h1 {\n    color: white; }\n  .blogItemContainer p {\n    font-size: 2em; }\n\n.blogPostOuter {\n  margin-bottom: 20px; }\n\n.searchBlogForm {\n  width: 50% !important;\n  margin: 0 auto; }\n  .searchBlogForm input {\n    font-size: 2em;\n    background: rgba(55, 63, 58, 0.7);\n    color: white;\n    border: 1px solid #74dc23; }\n    .searchBlogForm input::-webkit-input-placeholder {\n      color: rgba(255, 255, 255, 0.6) !important; }\n    .searchBlogForm input:-moz-placeholder {\n      /* Firefox 18- */\n      color: rgba(255, 255, 255, 0.6) !important; }\n    .searchBlogForm input::-moz-placeholder {\n      /* Firefox 19+ */\n      color: rgba(255, 255, 255, 0.6) !important; }\n    .searchBlogForm input:-ms-input-placeholder {\n      color: rgba(255, 255, 255, 0.6) !important; }\n    .searchBlogForm input:focus {\n      border: 1px solid #74dc23; }\n\na:hover {\n  color: white !important; }\n\n.searchInput {\n  margin-bottom: 10px !important; }\n\n.addPost {\n  margin: 0 auto !important; }\n\n.blogPostOuter:hover * {\n  text-shadow: 0 0 60px rgba(116, 220, 35, 0.6); }\n\n.writingsHeader {\n  text-align: center;\n  text-shadow: 0 0 60px rgba(116, 220, 35, 0.6);\n  color: white; }\n\n.blogCreateForm, .editForm {\n  width: 75%;\n  margin: 0 auto;\n  margin-top: 100px;\n  margin-bottom: 70px; }\n  .blogCreateForm input, .editForm input, .blogCreateForm textarea, .editForm textarea {\n    font-size: 2em;\n    background: rgba(55, 63, 58, 0.7);\n    color: white;\n    border: 1px solid #74dc23; }\n    .blogCreateForm input::-webkit-input-placeholder, .editForm input::-webkit-input-placeholder, .blogCreateForm textarea::-webkit-input-placeholder, .editForm textarea::-webkit-input-placeholder {\n      color: rgba(116, 220, 35, 0.6) !important; }\n    .blogCreateForm input:-moz-placeholder, .editForm input:-moz-placeholder, .blogCreateForm textarea:-moz-placeholder, .editForm textarea:-moz-placeholder {\n      /* Firefox 18- */\n      color: rgba(116, 220, 35, 0.6) !important; }\n    .blogCreateForm input::-moz-placeholder, .editForm input::-moz-placeholder, .blogCreateForm textarea::-moz-placeholder, .editForm textarea::-moz-placeholder {\n      /* Firefox 19+ */\n      color: rgba(116, 220, 35, 0.6) !important; }\n    .blogCreateForm input:-ms-input-placeholder, .editForm input:-ms-input-placeholder, .blogCreateForm textarea:-ms-input-placeholder, .editForm textarea:-ms-input-placeholder {\n      color: rgba(116, 220, 35, 0.6) !important; }\n    .blogCreateForm input:focus, .editForm input:focus, .blogCreateForm textarea:focus, .editForm textarea:focus {\n      border: 1px solid #74dc23; }\n\n.blogShow {\n  text-shadow: 0 0 60px rgba(116, 220, 35, 0.6);\n  word-wrap: break-word; }\n\n.formButtons {\n  background-color: rgba(116, 220, 35, 0.6) !important;\n  color: white !important;\n  border: 1px solid white;\n  margin-left: 10px; }\n  .formButtons:hover {\n    background-color: #373f3a !important;\n    border: 1px solid rgba(116, 220, 35, 0.6); }\n\n.repeatedImage {\n  max-height: 250px;\n  min-width: 50%; }\n\n.loader {\n  margin: 60px auto;\n  font-size: 10px;\n  position: relative;\n  text-indent: -9999em;\n  border-top: 1.1em solid rgba(255, 255, 255, 0.2);\n  border-right: 1.1em solid rgba(255, 255, 255, 0.2);\n  border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);\n  border-left: 1.1em solid #ffffff;\n  -webkit-transform: translateZ(0);\n  -ms-transform: translateZ(0);\n  transform: translateZ(0);\n  -webkit-animation: load8 1.1s infinite linear;\n  animation: load8 1.1s infinite linear; }\n\n.loader,\n.loader:after {\n  border-radius: 50%;\n  width: 30em;\n  height: 30em; }\n\n@-webkit-keyframes load8 {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg); }\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg); } }\n\n@keyframes load8 {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg); }\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg); } }\n", ""]);
 	
 	// exports
 
 
 /***/ },
-/* 331 */
+/* 333 */
 /***/ function(module, exports) {
 
 	/*
@@ -33094,7 +33746,7 @@
 
 
 /***/ },
-/* 332 */
+/* 334 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*

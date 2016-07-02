@@ -6,7 +6,7 @@ export const EDIT_BLOG = 'EDIT_BLOG';
 export const CREATE_BLOG = 'CREATE_BLOG';
 export const DELETE_BLOG = 'DELETE_BLOG';
 
-const ROOT_URL = 'http://localhost:3000/api/v1';
+const ROOT_URL = '/api/v1';
 
 export function fetchBlogs() {
   const request = axios.get(`${ROOT_URL}/blogs`);

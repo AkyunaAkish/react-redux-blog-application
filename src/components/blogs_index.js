@@ -79,7 +79,6 @@ class BlogsIndex extends Component {
   }
 
   render() {
-    if(!this.state.filteredBlogs) return (<div className="loader">Loading...</div>);
     return (
       <div>
         <h1 className="writingsHeader">Writings On The Wall</h1>

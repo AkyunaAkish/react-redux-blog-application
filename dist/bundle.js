@@ -33047,11 +33047,6 @@
 	    value: function render() {
 	      var _this3 = this;
 	
-	      if (!this.state.filteredBlogs) return _react2.default.createElement(
-	        'div',
-	        { className: 'loader' },
-	        'Loading...'
-	      );
 	      return _react2.default.createElement(
 	        'div',
 	        null,

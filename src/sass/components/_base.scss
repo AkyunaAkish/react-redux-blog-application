@@ -1,4 +1,180 @@
+@import 'variables';
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+img, embed, object, video{
+  max-width: 100%;
+  height: auto;
+}
+
 body {
-  background: black;
+  padding-top: 10px;
+  background: url("/images/stoneWall.jpg") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  font-family: 'Raleway', sans-serif;
+  color: $green;
+}
+.text-danger {
+  text-shadow: 0 0 20px red;
+}
+.has-danger {
+  input, textarea {
+    border: 1px solid maroon;
+  }
+}
+
+form a {
+  margin-left: 5px;
+}
+
+form textarea {
+  resize: none;
+}
+
+.link {
+  background: $dark;
+  color: $green;
+  margin-left: 10px;
+}
+
+.blogItemContainer {
+  background: $darkT;
+  color: $green;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  a {
+    text-decoration: none;
+  }
+  h1 {
+    color: white;
+  }
+  p {
+    font-size: 2em;
+  }
+}
+
+.blogPostOuter {
+  margin-bottom: 20px;
+}
+
+.searchBlogForm {
+  width: 50% !important;
+  margin: 0 auto;
+  input {
+    font-size: 2em;
+    background: $darkT;
+    color: white;
+    border: 1px solid $green;
+
+    &::-webkit-input-placeholder {
+      color: $whiteT !important;
+    }
+
+    &:-moz-placeholder { /* Firefox 18- */
+      color: $whiteT !important;
+    }
+
+    &::-moz-placeholder {  /* Firefox 19+ */
+      color: $whiteT !important;
+    }
+
+    &:-ms-input-placeholder {
+      color: $whiteT !important;
+    }
+    &:focus {
+      border: 1px solid $green;
+    }
+  }
+}
+
+a {
+  &:hover {
+    color: white !important;
+  }
+}
+
+.searchInput {
+  margin-bottom: 10px !important;
+}
+
+.addPost {
+  margin: 0 auto !important;
+}
+
+.blogPostOuter {
+  &:hover {
+    * {
+      text-shadow: 0 0 60px $greenT;
+    }
+  }
+}
+
+.writingsHeader {
+  text-align: center;
+  text-shadow: 0 0 60px $greenT;
   color: white;
+}
+
+
+.blogCreateForm {
+  width: 75%;
+  margin: 0 auto;
+  margin-top: 100px;
+  margin-bottom: 70px;
+  input, textarea {
+    font-size: 2em;
+    background: $darkT;
+    color: white;
+    border: 1px solid $green;
+
+    &::-webkit-input-placeholder {
+      color: $greenT !important;
+    }
+
+    &:-moz-placeholder { /* Firefox 18- */
+      color: $greenT !important;
+    }
+
+    &::-moz-placeholder {  /* Firefox 19+ */
+      color: $greenT !important;
+    }
+
+    &:-ms-input-placeholder {
+      color: $greenT !important;
+    }
+    &:focus {
+      border: 1px solid $green;
+    }
+  }
+}
+.editForm {
+  @extend .blogCreateForm;
+}
+
+.blogShow {
+  text-shadow: 0 0 60px $greenT;
+  word-wrap: break-word;
+}
+
+.formButtons {
+  background-color: $greenT !important;
+  color: white !important;
+  border: 1px solid white;
+  margin-left: 10px;
+  &:hover {
+    background-color: $dark !important;
+    border: 1px solid $greenT;
+  }
+}
+
+.repeatedImage {
+  max-height: 250px;
+  min-width: 50%;
 }

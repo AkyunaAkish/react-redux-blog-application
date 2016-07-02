@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
     table.increments();
     table.string('author');
     table.string('topic');
-    table.string('content');
+    table.string('content', 1000);
     table.string('image_url');
     table.timestamp('created_at').notNullable().defaultTo(knex.raw('now()'));
   })

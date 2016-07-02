@@ -9,8 +9,6 @@ import promise from 'redux-promise';
 import reducers from './reducers';
 import routes from './routes';
 
-// import 'jquery';
-// import 'bootstrap';
 import './sass/style.scss';
 
 const createStoreWithMiddleware = applyMiddleware(logger(), promise)(createStore);

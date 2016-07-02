@@ -31538,7 +31538,7 @@
 	var CREATE_BLOG = exports.CREATE_BLOG = 'CREATE_BLOG';
 	var DELETE_BLOG = exports.DELETE_BLOG = 'DELETE_BLOG';
 	
-	var ROOT_URL = 'http://localhost:3000/api/v1';
+	var ROOT_URL = '/api/v1';
 	
 	function fetchBlogs() {
 	  var request = _axios2.default.get(ROOT_URL + '/blogs');

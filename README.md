@@ -32,6 +32,7 @@ NPM
 ### Setup
 
 ```
+change const ROOT_URL in src/actions/index.js to equal http://localhost:3000
 $ createdb react_blog (if you have postgreSQL on your machine)
 - Setup .env file with connection string to your postgreSQL database
 $ npm install -g knex webpack webpack-dev-server nodemon

@@ -83,11 +83,11 @@ class BlogsIndex extends Component {
       <div>
         <h1 className="writingsHeader">Writings On The Wall</h1>
         <form onSubmit={this.onFormSubmit} className='input-group searchBlogForm'>
-          <input
+          {/*<input
             type="text"
             className='form-control searchInput'
             placeholder='Filter writings'
-            onInput={(event) => this.filterResults(event.target.value)}/>
+            onInput={(event) => this.filterResults(event.target.value)}/>*/}
           <Link to="/blogs/new" className="btn link addPost">Add New Writing</Link>
         </form>
 
